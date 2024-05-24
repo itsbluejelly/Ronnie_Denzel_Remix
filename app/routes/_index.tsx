@@ -1,41 +1,19 @@
-import type { MetaFunction } from "@remix-run/node";
+// IMPORTING NECESSARY FILES
+	// IMPORTING COMPONENTS
+import { Link } from "@remix-run/react"
 
-export const meta: MetaFunction = () => {
-  return [
-    { title: "New Remix App" },
-    { name: "description", content: "Welcome to Remix!" },
-  ];
-};
+// A FUNCTION THAT RETURNS THE HOME PAGE
+export default function Homepage(){
+	return (
+		<main id="content">
+			<header>
+				<h1>Notes App!</h1>
+				<p>A new efficient way to keep track of your notes</p>
+			</header>
 
-export default function Index() {
-  return (
-    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
-      <h1>Welcome to Remix</h1>
-      <ul>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/blog"
-            rel="noreferrer"
-          >
-            15m Quickstart Blog Tutorial
-          </a>
-        </li>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/jokes"
-            rel="noreferrer"
-          >
-            Deep Dive Jokes App Tutorial
-          </a>
-        </li>
-        <li>
-          <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
-            Remix Docs
-          </a>
-        </li>
-      </ul>
-    </div>
-  );
+			<p id="cta">
+				<Link to="/notes">Try now</Link>
+			</p>
+		</main>
+	)
 }
