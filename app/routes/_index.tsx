@@ -6,10 +6,8 @@ import { Link } from "@remix-run/react"
 export default function Homepage(){
 	return (
 		<main id="content">
-			<header>
-				<h1>Notes App!</h1>
-				<p>A new efficient way to keep track of your notes</p>
-			</header>
+			<h1>Notes App!</h1>
+			<p>A new efficient way to keep track of your notes</p>
 
 			<p id="cta">
 				<Link to="/notes">Try now</Link>

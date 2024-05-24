@@ -12,6 +12,8 @@ import {
 import mainStyleHref from "~/css/style.css?url"
 	// IMPORTING TYPES
 import { LinksFunction } from "@remix-run/node";
+	// IMPORTING COMPONENTS
+import Header from "./components/Header";
 
 // EXPORTING THE META TAG FOR THE APPLICATION
 export const meta: MetaFunction = () => [
@@ -37,6 +39,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 				<Links />
 			</head>
 			<body>
+				<Header/>
 				{children}
 				<ScrollRestoration />
 				<Scripts />
