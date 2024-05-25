@@ -18,12 +18,15 @@ export async function getData<DataType extends object>(
 	databaseName: keyof DatabaseType
 ): Promise<{data: DataType[]} | {error: string}>{
 	try{
+		console.log("Returning stored data---------------------------------")
         const recordedData: string = await fs.readFile(databasePath, "utf-8")
         const data: DataType[] = JSON.parse(recordedData)[databaseName]
         if(!data) throw new Error("Data not found, wrong path given")
 
+		console.log("Data found successfully\n")
         return {data}
     }catch(error: unknown){
+		console.log(`${(error as Error).name}: ${(error as Error).message}\n`)
         return {error: (error as Error).message}
     }
 }
@@ -36,6 +39,7 @@ export async function addData<DataType extends object>(
 ): Promise<{ error: string } | {data: DataType & {ID: string}}> {
 	try {
 		// READING THE INITIAL DATA
+		console.log("Adding data--------------------------------------------")
 		const recordedData: string = await fs.readFile(databasePath, "utf-8")
 		const oldData: DataType & { ID: string }[] = JSON.parse(recordedData)[databaseName]
 		if (!oldData) throw new Error("Data not found, wrong path given")
@@ -61,8 +65,10 @@ export async function addData<DataType extends object>(
 			"utf-8"
 		)
 		
+		console.log("Data added successfully\n")
         return {data: newData}
 	} catch (error: unknown) {
+		console.log(`${(error as Error).name}: ${(error as Error).message}\n`)
 		return { error: (error as Error).message }
 	}
 }
@@ -75,6 +81,7 @@ export async function editData<DataType extends object>(
 ): Promise<{ error: string } | {data: DataType & {ID: string}}> {
 	try {
 		// READING THE INITIAL DATA
+		console.log("Editing data--------------------------------------------")
 		const recordedData: string = await fs.readFile(databasePath, "utf-8")
 		const oldData: DataType & { ID: string }[] =JSON.parse(recordedData)[databaseName]
 		if (!oldData) throw new Error("Data not found, wrong path given")
@@ -98,8 +105,10 @@ export async function editData<DataType extends object>(
 			"utf-8"
 		)
 
+		console.log("Data edited successfully\n")
 		return { data: editedData as DataType & { ID: string } }
 	} catch (error: unknown) {
+		console.log(`${(error as Error).name}: ${(error as Error).message}\n`)
 		return { error: (error as Error).message }
 	}
 }
@@ -112,6 +121,7 @@ export async function deleteData<DataType extends object>(
 ): Promise<{ error: string } | { data: DataType & { ID: string } }> {
 	try {
 		// READING THE INITIAL DATA
+		console.log("Deleting data--------------------------------------------")
 		const recordedData: string = await fs.readFile(databasePath, "utf-8")
 		const storedData: DataType & { ID: string }[] = JSON.parse(recordedData)[databaseName]
 		if (!storedData) throw new Error("Data not found, wrong path given")
@@ -132,8 +142,10 @@ export async function deleteData<DataType extends object>(
 			"utf-8"
 		)
 
+		console.log("Data deleted successfully\n")
 		return { data: deletedData as DataType & { ID: string } }
 	} catch (error: unknown) {
+		console.log(`${(error as Error).name}: ${(error as Error).message}\n`)
 		return { error: (error as Error).message }
 	}
 }

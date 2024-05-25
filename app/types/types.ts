@@ -15,22 +15,18 @@ export type NoteType = {
     ID: string
 }
 
+// A TYPE FOR THE SERVER RESPONSE
+export type ServerResponse = OptionalGenerator<{
+    error: string
+    data: unknown
+    success: string
+}>
+
 // A TYPE FOR THE DATABASE RESPONSE
 export type DatabaseResponse = OptionalGenerator<{
 	error: string
 	data: unknown
 }>
 
-// A TYPE FOR THE SERVER RESPONSE
-export type ServerResponse = OptionalGenerator<{
-    error: string, 
-    success: string,
-    data: unknown 
-}>
-
 // A TYPE FOR THE FORM STATUS
-export type FormStatus = {
-    loading: boolean,
-    error: string,
-    success: string
-}
+export type FormStatusType = ObjectGenerator<"success" | "error", string>
