@@ -1,10 +1,11 @@
+// IMPORTING NECESSARY FILES
+	// IMPORTING PROPS
+import { FormProps } from "~/types/props"
+
 // EXPORTING A FORM COMPONENT
-export default function Form(){
+export default function Form({formData, handleClick, handleFormData, disabled}: FormProps){
     return (
-		<form
-			method="post"
-			id="note-form"
-        >
+		<form id="note-form">
 			<div>
 				<label htmlFor="title">Title</label>
 				<input
@@ -12,6 +13,8 @@ export default function Form(){
 					id="title"
 					name="title"
 					required
+					value={formData.title}
+					onChange={(e) => handleFormData(e)}
 				/>
 			</div>
 
@@ -21,11 +24,16 @@ export default function Form(){
 					id="content"
 					name="content"
 					rows={5}
+					value={formData.content}
+					onChange={(e) => handleFormData(e)}
 				/>
 			</div>
 
 			<div className="form-actions">
-				<button>Add Note</button>
+				<button 
+					onClick={() => handleClick()}
+					disabled={disabled}
+				>Add Note</button>
 			</div>
 		</form>
 	)

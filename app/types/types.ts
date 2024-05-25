@@ -4,14 +4,33 @@ import { ObjectGenerator, OptionalGenerator, Excluder } from "./generics"
 
 // A TYPE FOR THE DATABASE
 export type DatabaseType = ObjectGenerator<"notes", string>
-// A TYPEFOR THE NOTE ERROR
-export type NoteErrorType = OptionalGenerator<Excluder<NoteType, "date">>
 // A TYPE FOR THE FORMDATA
-export type FormDataType = Excluder<NoteType, "date">
+export type FormDataType = Excluder<NoteType, "date" | "ID">
 
 // A TYPE FOR THE NOTES
 export type NoteType = {
     title: string,
     content?: string,
-    date: Date 
+    date: Date ,
+    ID: string
+}
+
+// A TYPE FOR THE DATABASE RESPONSE
+export type DatabaseResponse = OptionalGenerator<{
+	error: string
+	data: unknown
+}>
+
+// A TYPE FOR THE SERVER RESPONSE
+export type ServerResponse = OptionalGenerator<{
+    error: string, 
+    success: string,
+    data: unknown 
+}>
+
+// A TYPE FOR THE FORM STATUS
+export type FormStatus = {
+    loading: boolean,
+    error: string,
+    success: string
 }

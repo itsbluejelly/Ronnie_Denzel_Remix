@@ -6,6 +6,7 @@ import {randomBytes} from "crypto"
     // IMPORTING TYPES
 import { DatabaseType } from "~/types/types"
 import { fileURLToPath } from "url"
+
 // CREATING A DATABASE OBJECT
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const database: DatabaseType = { notes: path.join(__dirname, '..', 'database', 'notes.json') }
@@ -32,25 +33,37 @@ export async function addData<DataType extends object>(
 	databasePath: string,
 	databaseName: keyof DatabaseType,
 	data: DataType
-): Promise<{ message: string }> {
+): Promise<{ error: string } | {data: DataType & {ID: string}}> {
 	try {
 		// READING THE INITIAL DATA
 		const recordedData: string = await fs.readFile(databasePath, "utf-8")
-		const storedData: DataType[] = JSON.parse(recordedData)[databaseName]
-		if (!storedData) throw new Error("Data not found, wrong path given")
-		// ADDING THE DATA
-		const ID: string = randomBytes(5).toString("hex")
-		const newData = { [databaseName]: [{ ID, ...data }, ...storedData] }
+		const oldData: DataType & { ID: string }[] = JSON.parse(recordedData)[databaseName]
+		if (!oldData) throw new Error("Data not found, wrong path given")
+			// ADDING THE DATA
+		let ID: string = randomBytes(5).toString("hex")
+		
+		// eslint-disable-next-line no-constant-condition
+		while(true){
+			const foundData = oldData.find(data => data.ID === ID)
+			
+			if(foundData){
+				ID = randomBytes(5).toString("hex")
+			}else{
+				break
+			}
+		}
+
+		const newData = { ID, ...data }
 		
         await fs.writeFile(
 			databasePath,
-			JSON.stringify(newData, null, 4),
+			JSON.stringify({ [databaseName]: [newData, ...oldData] }, null, 4),
 			"utf-8"
 		)
 		
-        return { message: "Data added succcessfully" }
+        return {data: newData}
 	} catch (error: unknown) {
-		return { message: (error as Error).message }
+		return { error: (error as Error).message }
 	}
 }
 
@@ -59,29 +72,35 @@ export async function editData<DataType extends object>(
 	databasePath: string,
 	databaseName: keyof DatabaseType,
 	newData: DataType & { ID: string }
-): Promise<{ message: string }> {
+): Promise<{ error: string } | {data: DataType & {ID: string}}> {
 	try {
 		// READING THE INITIAL DATA
 		const recordedData: string = await fs.readFile(databasePath, "utf-8")
-		const storedData: DataType & { ID: string }[] =JSON.parse(recordedData)[databaseName]
-		if (!storedData) throw new Error("Data not found, wrong path given")
+		const oldData: DataType & { ID: string }[] =JSON.parse(recordedData)[databaseName]
+		if (!oldData) throw new Error("Data not found, wrong path given")
 		
         // EDITING THE DATA
-		const editedData = {
-			[databaseName]: storedData.map((data) =>
-				data.ID === newData.ID ? { ...data, ...newData } : data
-			),
+		let editedData = oldData.find(data => data.ID === newData.ID)
+		
+		if (!editedData){
+			throw new Error("Data doesn't exist, wrong ID given")
+		}else{
+			editedData = {...editedData, ...newData}
 		}
+
+		const changedData: { ID: string }[] = oldData.map((data) =>
+			data.ID === editedData.ID ? editedData : data
+		)
 
 		await fs.writeFile(
 			databasePath,
-			JSON.stringify(editedData, null, 4),
+			JSON.stringify(changedData, null, 4),
 			"utf-8"
 		)
 
-		return { message: "Data edited succcessfully" }
+		return { data: editedData as DataType & { ID: string } }
 	} catch (error: unknown) {
-		return { message: (error as Error).message }
+		return { error: (error as Error).message }
 	}
 }
 
@@ -90,15 +109,22 @@ export async function deleteData<DataType extends object>(
 	databasePath: string,
 	databaseName: keyof DatabaseType,
 	oldData: DataType & { ID: string }
-): Promise<{ message: string }> {
+): Promise<{ error: string } | { data: DataType & { ID: string } }> {
 	try {
 		// READING THE INITIAL DATA
 		const recordedData: string = await fs.readFile(databasePath, "utf-8")
-		const storedData: DataType & { ID: string }[] =JSON.parse(recordedData)[databaseName]
+		const storedData: DataType & { ID: string }[] = JSON.parse(recordedData)[databaseName]
 		if (!storedData) throw new Error("Data not found, wrong path given")
-		
-        // DELETING THE DATA
-		const newData = { [databaseName]: storedData.filter(data => data.ID !== oldData.ID)}
+
+		// DELETING THE DATA
+		const deletedData = storedData.find((data) => data.ID === oldData.ID)
+		if (!deletedData) throw new Error("Data doesn't exist, wrong ID given")
+
+		const newData = {
+			[databaseName]: storedData.filter(
+				(data) => data.ID !== deletedData.ID
+			),
+		}
 
 		await fs.writeFile(
 			databasePath,
@@ -106,8 +132,8 @@ export async function deleteData<DataType extends object>(
 			"utf-8"
 		)
 
-		return { message: "Data deleted succcessfully" }
+		return { data: deletedData as DataType & { ID: string } }
 	} catch (error: unknown) {
-		return { message: (error as Error).message }
+		return { error: (error as Error).message }
 	}
 }
