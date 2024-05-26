@@ -101,7 +101,7 @@ export async function editData<DataType extends object>(
 
 		await fs.writeFile(
 			databasePath,
-			JSON.stringify(changedData, null, 4),
+			JSON.stringify({notes: changedData}, null, 4),
 			"utf-8"
 		)
 

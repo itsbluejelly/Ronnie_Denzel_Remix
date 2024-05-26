@@ -37,5 +37,8 @@ export type DatabaseResponse = OptionalGenerator<{
 
 // A TYPE FOR THE FORM STATUS
 export type FormStatusType = Prettier<
-	ObjectGenerator<"success" | "error", string> & { isOpen: boolean }
+	ObjectGenerator<"success" | "error", string> & { 
+        isOpen: boolean
+        formMode: "edit" | "add" 
+    }
 >
