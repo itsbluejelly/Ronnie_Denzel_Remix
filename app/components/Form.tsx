@@ -1,11 +1,16 @@
+// IMPORTING NECESSARY FILES
+	// IMPORTING COMPONENTS
+import { Form as RemixForm } from "@remix-run/react"
+	// IMPORTING TYPES
+import { FormProps } from "~/types/props"
+
 // EXPORTING A FORM COMPONENT
-export default function Form(){
+export default function Form({disabled, formStatus}: FormProps){
     return (
-		<form
+		<RemixForm
 			id="note-form"
 			method="POST"
-			action="/notes"
-		>
+			action="/notes">
 			<div>
 				<label htmlFor="title">Title</label>
 				<input
@@ -26,8 +31,14 @@ export default function Form(){
 			</div>
 
 			<div className="form-actions">
-				<button>Add Note</button>
+				<button disabled={disabled}>{disabled ? "Loading...": "Add data"}</button>
+
+				{(formStatus.error || formStatus.success) && (
+					<p className={formStatus.error ? "error" : "success"}>
+						{formStatus.success || formStatus.error}
+					</p>
+				)}
 			</div>
-		</form>
+		</RemixForm>
 	)
 }

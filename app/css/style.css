@@ -73,6 +73,16 @@ body {
   border-radius: 8px;
 }
 
+.success {
+  max-width: 25rem;
+  margin: 3rem auto;
+  padding: 2rem;
+  text-align: center;
+  background-color:green;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
 .info-message {
   margin: 2rem;
   text-align: center;
@@ -179,4 +189,35 @@ body {
   background-color: var(--color-primary-200);
   color: var(--color-primary-300);
   cursor: not-allowed;
+}
+
+#note-details {
+  max-width: 40rem;
+  margin: 3rem auto;
+  padding: 2rem;
+  text-align: center;
+  color: var(--color-primary-50);
+  background-color: var(--color-primary-800);
+  border-radius: 24px;
+  animation: fade-slide-in 1s ease-out forwards;
+}
+
+#note-details nav {
+  margin: 1rem 0 2rem 0;
+}
+
+#note-details header a {
+  color: var(--color-primary-300);
+  text-decoration: none;
+  padding: 0.5rem;
+}
+
+#note-details header a:hover {
+  color: var(--color-primary-500);
+}
+
+#note-details-content {
+  color: var(--color-primary-200);
+  font-size: 1.15rem;
+  white-space: pre-wrap;
 }

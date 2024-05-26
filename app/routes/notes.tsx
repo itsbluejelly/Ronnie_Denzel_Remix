@@ -8,26 +8,26 @@ import { FormStatusType, ServerResponse } from "~/types/types"
 import { addNote as addNoteServer } from "~/lib/serverHelpers"
     // IMPORTING MODULES
 import React from "react"
-import { useActionData } from "@remix-run/react"
+import { useActionData, useNavigation } from "@remix-run/react"
 
 // A SERVER ACTION FOR THE POST REQUEST
 export const action: ActionFunction = async({request}) => {
-    try{
-        if(request.method === "POST"){
-            return addNoteServer(request)
-        }else{
-            return json({error: "Wrong HTTP method for this server route"}, {status: 503})
-        }
-    }catch(error: unknown){
-        console.error((error as Error).message)
-        return json({error: (error as Error).message}, {status: 500})
-    }
+    if (request.method === "POST") {
+		return addNoteServer(request)
+	} else {
+		throw json(
+			{ error: "Wrong HTTP method for this server route" },
+			{ status: 503 }
+		)
+	}
 }
 
 // A FUNCTION THAT RETURNS THE NOTESPAGE
 export default function NotesPage(){
 	// FETCHING LATEST ACTION CALL
-    const APIResponse: ServerResponse = useActionData()!
+    const APIResponse: ServerResponse | undefined = useActionData()
+    // GETTING THE STATE OF A FORM SUBMISSION
+    const {state: loading} = useNavigation()
 
 	// A STATE TO KEEP TRACK OF THE FORM
 	const [formStatus, setFormStatus] = React.useState<FormStatusType>({
@@ -45,8 +45,10 @@ export default function NotesPage(){
 
 	return (
 		<main>
-			<Form />
-			<p>{formStatus.success ?? formStatus.error}</p>
+			<Form 
+                formStatus={formStatus}
+                disabled={loading === "loading"}
+            />
 		</main>
 	)
 }
