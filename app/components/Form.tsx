@@ -5,12 +5,14 @@ import { Form as RemixForm } from "@remix-run/react"
 import { FormProps } from "~/types/props"
 
 // EXPORTING A FORM COMPONENT
-export default function Form({disabled, formStatus}: FormProps){
+export default function Form({disabled, handleClick}: FormProps){
     return (
 		<RemixForm
 			id="note-form"
 			method="POST"
-			action="/notes">
+			action="/notes"
+			onSubmit={handleClick}
+		>
 			<div>
 				<label htmlFor="title">Title</label>
 				<input
@@ -31,13 +33,12 @@ export default function Form({disabled, formStatus}: FormProps){
 			</div>
 
 			<div className="form-actions">
-				<button disabled={disabled}>{disabled ? "Loading...": "Add data"}</button>
-
-				{(formStatus.error || formStatus.success) && (
-					<p className={formStatus.error ? "error" : "success"}>
-						{formStatus.success || formStatus.error}
-					</p>
-				)}
+				<button
+					className="form-actions--button"
+					disabled={disabled}
+				>
+					{disabled ? "Loading..." : "Add data"}
+				</button>
 			</div>
 		</RemixForm>
 	)

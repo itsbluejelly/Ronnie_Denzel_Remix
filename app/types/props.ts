@@ -1,8 +1,14 @@
-// IMPORTING NECESSARY TYPES
-import { FormStatusType } from "./types";
+// IMPORTING NECESSARY FILES
+    // IMPORTING TYPES
+import { NoteType } from "./types";
+    // IMPORTING GENERICS
+import {Prettier} from "./generics"
 
 // PROPS FOR THE FORM COMPONENT
 export type FormProps = {
-    formStatus: FormStatusType,
-    disabled: boolean
+    disabled: boolean,
+    handleClick(): void
 }
+
+// PROPS FOR THE NOTE COMPONENT
+export type NoteProps = Prettier<NoteType & { index: number }>

@@ -8,7 +8,7 @@ export function isNotes(data: unknown): data is NoteType[]{
             typeof note === "object" && "ID" in note &&
             typeof note.ID === "string" && "title" in note &&
             typeof note.title === "string" && "date" in note &&
-            typeof note.date === typeof Date
+            typeof note.date === "string"
         ))
     }else{
         return false
