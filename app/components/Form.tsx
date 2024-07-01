@@ -15,7 +15,7 @@ export default function Form({
 	handleChange,
 }: FormProps) {
 	// DEFINING A FETCHER THE FORM SHOULD USE
-	const Fetcher = useFetcher<ServerResponse>({key: "notes"})
+	const Fetcher = useFetcher<ServerResponse>()
 
 	return (
 		<Fetcher.Form

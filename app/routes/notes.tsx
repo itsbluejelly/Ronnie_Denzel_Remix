@@ -4,14 +4,7 @@ import Form from "~/components/Form"
 import Note from "~/components/Note"
     // IMPORTING TYPES
 import { ActionFunction, json, LoaderFunction } from "@remix-run/node"
-import { FormStatusType, ServerResponse, FormDataType } from "~/types/types"
-    // IMPORTING LIB FUNCTIONS
-import {
-	addNote as addNoteServer,
-	getNotes as getNotesServer,
-	editNote as editNoteServer,
-	deleteNote as deleteNoteServer,
-} from "~/lib/serverHelpers"
+import { FormStatusType, ServerResponse } from "~/types/types"
     // IMPORTING MODULES
 import React from "react"
 
