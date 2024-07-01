@@ -2,18 +2,15 @@
     // IMPORTING GENERICS
 import { ObjectGenerator, OptionalGenerator, Prettier } from "./generics"
 
-// A TYPE FOR THE DATABASE
-export type DatabaseType = ObjectGenerator<"notes", string>
-
-// A TYPE FOR THE SERVER RESPONSE
-export type ServerResponse = OptionalGenerator<{
+// A TYPE FOR THE ACTION RESPONSE
+export type ActionResponse = OptionalGenerator<{
     error: string
     data: unknown
     success: string
 }>
 
-// A TYPE FOR THE DATABASE RESPONSE
-export type DatabaseResponse = OptionalGenerator<{
+// A TYPE FOR THE LOADER RESPONSE
+export type LoaderResponse = OptionalGenerator<{
 	error: string
 	data: unknown
 }>

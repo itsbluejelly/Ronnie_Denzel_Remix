@@ -30,7 +30,7 @@ export const action: ActionFunction = async({request}) => {
             )
     }
 }
-
+global.NodeJS
 // A LOADER FUNCTION FOR THE NOTES ROUTE
 export const loader: LoaderFunction = ({request}) => getNotesServer(request)
 

@@ -1,8 +1,6 @@
 // IMPORTING NECESSARY FILES
 import { notes as recordedNotes } from "./seed.json"
-import { PrismaClient } from "@prisma/client"
-
-const prisma = new PrismaClient()
+import prisma from "utils/prismaClient"
 
 // The function to seed the database
 async function seed() {
@@ -17,7 +15,7 @@ async function seed() {
 			throw new Error("The database is already occupied😐")
 		}
 
-		// Check if the env if in production
+        // Check if the env if in production
 		console.log(
 			"\t\t2. Checking if the database is in production mode🧐..."
 		)
