@@ -1,6 +1,5 @@
 // IMPORTING NECESSARY FILES
 // IMPORTING GENERICS
-import { ObjectGenerator, Prettier } from "./generics"
 import { z } from "zod"
 import { noteIDSchema, noteSchema } from "utils/schemas"
 
@@ -22,9 +21,7 @@ export type LoaderResponse = {
 }
 
 // A TYPE FOR THE FORM STATUS
-export type FormStatusType = Prettier<
-	ObjectGenerator<"success" | "error", string> & {
-		isOpen: boolean
-		formMode: "edit" | "add"
-	}
->
+export type FormStatusType = {
+	isOpen: boolean
+	formMode: "edit" | "add"
+}

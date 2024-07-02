@@ -27,7 +27,7 @@ export type OptionalGenerator<ObjectType extends object> = {
  * A Generic to exclude a key in an object
  * @param ObjectType The object Type to work on
  * @param ExludedKey the key to remove
-*/
+ */
 export type Excluder<
 	ObjectType extends object,
 	ExcludedKey extends keyof ObjectType
@@ -41,7 +41,7 @@ export type Excluder<
  * A Generic to pick a key from an object
  * @param ObjectType The object Type to work on
  * @param InludedKey the key to retain
-*/
+ */
 export type Picker<
 	ObjectType extends object,
 	IncludedKey extends keyof ObjectType
@@ -50,3 +50,13 @@ export type Picker<
 		? key
 		: never]: ObjectType[key]
 }
+
+/**
+ * A Generic to get the return type of a function
+ * @param FuctionType The typr of function to parse
+ */
+
+export type GetFunctionReturn<FunctionType extends (...args: never) => unknown> =
+	FunctionType extends (...args: never) => infer ReturnType
+		? ReturnType
+		: unknown

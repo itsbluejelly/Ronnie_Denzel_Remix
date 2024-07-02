@@ -3,6 +3,7 @@ import prisma from "utils/prismaClient"
 import { Picker } from "~/types/generics"
 import { ActionFunctionArgs, json } from "@remix-run/node"
 import { noteSchema, noteIDSchema } from "utils/schemas"
+import { parseWithZod } from "@conform-to/zod"
 
 // Declaring a request type
 type RequestType = Picker<ActionFunctionArgs, "request">["request"]
@@ -13,56 +14,51 @@ type RequestType = Picker<ActionFunctionArgs, "request">["request"]
  */
 export async function addNote(request: RequestType) {
 	const formData = await request.formData()
-
-	// Validate the formData
-	const submission = noteSchema.safeParse(formData)
-	let { success: parseSuccess } = submission
-	const { data: parsedData, error: parsedError } = submission
+	const submission = parseWithZod<typeof noteSchema>(formData, {schema: noteSchema})
 
 	try {
-		if (!parseSuccess) {
-			console.error({ error: parsedError?.flatten() })
-
+		if (submission.status !== "success") {
 			return json(
-				{ error: parsedError?.flatten() },
-				{ status: 400, statusText: "Bad request" }
+				{ reply: submission.reply() },
+
+				{
+					status: 400,
+					statusText: "Bad request",
+				}
 			)
 		}
 
+		const { title, content } = submission.value
+
 		// Add the note if all is okay
 		const newNote = await prisma.note.create({
-			data: {
-				title: parsedData?.title as string,
-				content: parsedData?.content,
-			},
-
+			data: { title, content },
 			select: { id: true },
 		})
 
 		if (newNote.id) {
-			console.log({ _id: newNote.id })
-
-			return json(
-				{ success: "New note created successfully" },
-				{ status: 201, statusText: "created" }
-			)
+			console.log({ id: newNote.id })
 		} else {
 			throw new Error("An error during creation occured")
 		}
 	} catch (error: unknown) {
-		parseSuccess = false
+		submission.status = "error"
 
-		parsedError?.addIssue({
-			path: [""],
-			code: "custom",
-			message: error
-				? `${(error as Error).name}: ${(error as Error).message}`
-				: "An internal server error occured",
-		})
+		return json(
+			{
+				reply: submission.reply({
+					formErrors: [
+						error
+							? `${(error as Error).name}: ${
+									(error as Error).message
+							}`
+							: "An internal server error occured",
+					],
+				}),
+			},
 
-		console.error({ error: parsedError?.flatten() })
-
-		return json({ error: parsedError?.flatten() }, { status: 400 })
+			{ status: 500 }
+		)
 	}
 }
 
@@ -83,7 +79,7 @@ export async function readNotes() {
 				{ status: 200, statusText: "data found" }
 			)
 		} else {
-			console.error({ error: "Notes not found", data: [] })
+			console.error({ error: "Notes not found" })
 
 			return json(
 				{ error: "Notes not found", data: [] },
@@ -98,9 +94,11 @@ export async function readNotes() {
 				error: error
 					? `${(error as Error).name}: ${(error as Error).message}`
 					: "An internal server error occured",
+
+				data: []
 			},
 
-			{ status: 400, statusText: "Bad request" }
+			{ status: 500 }
 		)
 	}
 }
@@ -114,56 +112,47 @@ export async function updateNote(request: RequestType) {
 	const formSchema = noteSchema.and(noteIDSchema)
 
 	// Validate the formData
-	const submission = formSchema.safeParse(formData)
-	let { success: parseSuccess } = submission
-	const { data: parsedData, error: parsedError } = submission
+	const submission = parseWithZod(formData, {schema: formSchema})
 
 	try {
-		if (!parseSuccess) {
-			console.error({ error: parsedError?.flatten() })
-
+		if (submission.status !== "success") {
 			return json(
-				{ error: parsedError?.flatten() },
+				{ reply: submission.reply() },
 				{ status: 400, statusText: "Bad request" }
 			)
 		}
 
+		const {id, title, content} = submission.value
+
 		// Update the note if all is okay
 		const updatedNote = await prisma.note.update({
-			where: { id: parsedData?._id },
-
-			data: {
-				title: parsedData?.title,
-				content: parsedData?.content,
-			},
-
-			select: { id: true },
+			where: { id },
+			data: {title, content},
+			select: { id: true }
 		})
 
 		if (updatedNote.id) {
-			console.log({ _id: updatedNote.id })
-
-			return json(
-				{ success: "Note updated successfully" },
-				{ status: 200, statusText: "updated successfully" }
-			)
+			console.log({ id: updatedNote.id })
 		} else {
 			throw new Error("An error during creation occured")
 		}
 	} catch (error: unknown) {
-		parseSuccess = false
+		submission.status = "error"
 
-		parsedError?.addIssue({
-			path: [""],
-			code: "custom",
-			message: error
-				? `${(error as Error).name}: ${(error as Error).message}`
-				: "An internal server error occured",
-		})
+		return json({
+			reply: submission.reply({
+				formErrors: [
+					error
+						? `${(error as Error).name}: ${
+								(error as Error).message
+						}`
+						: "An internal server error occured",
+				],
+			}),
+		},
 
-		console.error({ error: parsedError?.flatten() })
-
-		return json({ error: parsedError?.flatten() }, { status: 400 })
+			{ status: 400 }
+		)
 	}
 }
 
@@ -173,51 +162,46 @@ export async function updateNote(request: RequestType) {
  */
 export async function deleteNote(request: RequestType) {
 	const formData = await request.formData()
-
-	// Validate the formData
-	const submission = noteIDSchema.safeParse(formData)
-	let { success: parseSuccess } = submission
-	const { data: parsedData, error: parsedError } = submission
+	const submission = parseWithZod<typeof noteIDSchema>(formData, {schema: noteIDSchema})
 
 	try {
-		if (!parseSuccess) {
-			console.error({ error: parsedError?.flatten() })
-
+		if (submission.status !== "success") {
 			return json(
-				{ error: parsedError?.flatten() },
+				{ reply: submission.reply() },
 				{ status: 400, statusText: "Bad request" }
 			)
 		}
 
+		const {id} = submission.value
+
 		// Delete the note if all is okay
 		const deletedNote = await prisma.note.delete({
-            where: {id: parsedData?._id},
-            select: {id: true}
-        })
+			where: { id },
+			select: { id: true },
+		})
 
 		if (deletedNote.id) {
-			console.log({ _id: deletedNote.id })
-
-			return json(
-				{ success: "Note deleted successfully" },
-				{ status: 200, statusText: "deleted" }
-			)
+			console.log({ id: deletedNote.id })
 		} else {
 			throw new Error("An error during creation occured")
 		}
 	} catch (error: unknown) {
-		parseSuccess = false
+		submission.status = "error"
 
-		parsedError?.addIssue({
-			path: [""],
-			code: "custom",
-			message: error
-				? `${(error as Error).name}: ${(error as Error).message}`
-				: "An internal server error occured",
-		})
+		return json(
+			{
+				reply: submission.reply({
+					formErrors: [
+						error
+							? `${(error as Error).name}: ${
+									(error as Error).message
+							}`
+							: "An internal server error occured",
+					],
+				}),
+			},
 
-		console.error({ error: parsedError?.flatten() })
-
-		return json({ error: parsedError?.flatten() }, { status: 400 })
+			{ status: 500 }
+		)
 	}
 }

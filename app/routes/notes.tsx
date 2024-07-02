@@ -3,86 +3,76 @@
 import Form from "~/components/Form"
 import Note from "~/components/Note"
     // IMPORTING TYPES
-import { ActionFunction, json, LoaderFunction } from "@remix-run/node"
-import { FormStatusType, ServerResponse } from "~/types/types"
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node"
+import { FormStatusType } from "~/types/types"
     // IMPORTING MODULES
 import React from "react"
-
+import { addNote, deleteNote, readNotes, updateNote } from "~/lib/notes.server"
 import { useFetcher, useLoaderData } from "@remix-run/react"
+import {useForm} from "@conform-to/react"
+import {getZodConstraint, parseWithZod} from "@conform-to/zod"
     // IMPORTING GUARDS
 import { isNotes } from "~/types/guards"
     // IMPORTING GENERICS
-import { Excluder } from "~/types/generics"
+import { Excluder, GetFunctionReturn } from "~/types/generics"
+import { noteIDSchema, noteSchema } from "utils/schemas"
+import { z } from "zod"
 
 // A SERVER ACTION FOR THE NOTES ROUTE
-export const action: ActionFunction = async({request}) => {
+export async function action({request}: ActionFunctionArgs){
     switch(request.method){
-        case "POST":
-            return addNoteServer(request)
         case "PATCH":
-            return editNoteServer(request)
+            return updateNote(request)
         case "DELETE":
-            return deleteNoteServer(request)
+            return deleteNote(request)
         default:
-            throw json(
-                { error: "Wrong HTTP method for this server route" },
-                { status: 503 }
-            )
+            return addNote(request)
     }
 }
 
 // A LOADER FUNCTION FOR THE NOTES ROUTE
-export const loader: LoaderFunction = ({request}) => getNotesServer(request)
+export async function loader(){
+    return readNotes()
+}
 
 // A FUNCTION THAT RETURNS THE NOTESPAGE
 export default function NotesPage(){
 	// FETCHING LATEST ACTION AND LOADER CALLS AND FORM NAVIGATION
-    const fetcher = useFetcher<ServerResponse>({key: "notes"})
+    const fetcher = useFetcher<typeof action>()
     const loading = fetcher.state
     const APIResponse = fetcher.data
-    const APIData = useLoaderData<ServerResponse>()
+    const APIData = useLoaderData<typeof loader>()
+
+    // Defining the form attributes
+    const formSchema = noteSchema.and(noteIDSchema.partial())
+    type formType = z.infer<typeof formSchema>
+    
+    const [form, fields] = useForm<formType>({
+        lastResult: APIResponse?.reply,
+        constraint: getZodConstraint(formSchema),
+        
+        defaultValue: {
+            content: "",
+            id: "",
+            title: ""
+        },
+
+        onValidate: ({formData}) => parseWithZod(formData, {schema: formSchema}),
+        shouldValidate: "onBlur",
+        shouldRevalidate: "onInput"
+    })
 
         // DEFINING STATES
 	// A STATE TO KEEP TRACK OF THE FORM STATUS
 	const [formStatus, setFormStatus] = React.useState<FormStatusType>({
-		error: "",
-		success: "",
         isOpen: false,
         formMode: "add"
 	})
 
-    // A STATE TO KEEP TRACK OF THE SERVER STATUS
-    const [serverStatus, setServerStatus] = React.useState<
-		Excluder<FormStatusType, "isOpen" | "formMode">
-	>({
-		error: "",
-		success: "",
-	})
-
-    // A STATE TO KEEP TRACK OF THE FORM
-    const [formData, setFormData] = React.useState<FormDataType & {ID: string}>({
-        ID: "",
-        title: "",
-        content: ""
-    })
-
-    // A FUNCTION TO HANDLE THE FORM DATA
-    function handleFormData(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void{
-        const {name, value} = e.target
-
-        setFormData(prevState => ({
-            ...prevState,
-            [name]: value
-        }))
-    } 
-
     // A FUNCTION THAT REURNS AN ARRAY OF NOTES
     function notesGenerator(): JSX.Element[] | void{
-        if(!isNotes(APIData.data)){
-            return setServerStatus({
-				success: "",
-				error: "The data fetched is not of the required format",
-			})
+        if(!APIData.data.length || !isNotes(APIData.data)){
+            
         }else{
             return APIData.data.map((data, index) => (
 				<li
