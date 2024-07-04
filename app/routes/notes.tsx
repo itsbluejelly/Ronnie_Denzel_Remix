@@ -1,182 +1,224 @@
 // IMPORTING NECESSARY FILES
-    // IMPORTING COMPONENTS
-import Form from "~/components/Form"
+// IMPORTING COMPONENTS
 import Note from "~/components/Note"
-    // IMPORTING TYPES
-import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node"
-import { FormStatusType } from "~/types/types"
-    // IMPORTING MODULES
+// IMPORTING TYPES
+import { ActionFunctionArgs } from "@remix-run/node"
+import { PageStatusType } from "~/types/types"
+// IMPORTING MODULES
 import React from "react"
 import { addNote, deleteNote, readNotes, updateNote } from "~/lib/notes.server"
 import { useFetcher, useLoaderData } from "@remix-run/react"
-import {useForm} from "@conform-to/react"
-import {getZodConstraint, parseWithZod} from "@conform-to/zod"
-    // IMPORTING GUARDS
+import { useForm, getInputProps, getTextareaProps } from "@conform-to/react"
+import { getZodConstraint, parseWithZod } from "@conform-to/zod"
+// IMPORTING GUARDS
 import { isNotes } from "~/types/guards"
-    // IMPORTING GENERICS
-import { Excluder, GetFunctionReturn } from "~/types/generics"
+// IMPORTING GENERICS
 import { noteIDSchema, noteSchema } from "utils/schemas"
 import { z } from "zod"
 
 // A SERVER ACTION FOR THE NOTES ROUTE
-export async function action({request}: ActionFunctionArgs){
-    switch(request.method){
-        case "PATCH":
-            return updateNote(request)
-        case "DELETE":
-            return deleteNote(request)
-        default:
-            return addNote(request)
-    }
+export async function action({ request }: ActionFunctionArgs) {
+	switch (request.method) {
+		case "PATCH":
+			return updateNote(request)
+		case "DELETE":
+			return deleteNote(request)
+		default:
+			return addNote(request)
+	}
 }
 
 // A LOADER FUNCTION FOR THE NOTES ROUTE
-export async function loader(){
-    return readNotes()
+export async function loader() {
+	return readNotes()
 }
 
 // A FUNCTION THAT RETURNS THE NOTESPAGE
-export default function NotesPage(){
+export default function NotesPage() {
 	// FETCHING LATEST ACTION AND LOADER CALLS AND FORM NAVIGATION
-    const fetcher = useFetcher<typeof action>()
-    const loading = fetcher.state
-    const APIResponse = fetcher.data
-    const APIData = useLoaderData<typeof loader>()
+	const fetcher = useFetcher<typeof action>()
+	const loading = fetcher.state
+	const APIResponse = fetcher.data
+	const APIData = useLoaderData<typeof loader>()
 
-    // Defining the form attributes
-    const formSchema = noteSchema.and(noteIDSchema.partial())
-    type formType = z.infer<typeof formSchema>
-    
-    const [form, fields] = useForm<formType>({
-        lastResult: APIResponse?.reply,
-        constraint: getZodConstraint(formSchema),
-        
-        defaultValue: {
-            content: "",
-            id: "",
-            title: ""
-        },
+	// Defining the form attributes
+	const formSchema = noteSchema.and(noteIDSchema.partial())
+	type formType = z.infer<typeof formSchema>
 
-        onValidate: ({formData}) => parseWithZod(formData, {schema: formSchema}),
-        shouldValidate: "onBlur",
-        shouldRevalidate: "onInput"
-    })
+	const [form, fields] = useForm<formType>({
+		lastResult: APIResponse?.reply,
+		constraint: getZodConstraint(formSchema),
 
-        // DEFINING STATES
-	// A STATE TO KEEP TRACK OF THE FORM STATUS
-	const [formStatus, setFormStatus] = React.useState<FormStatusType>({
-        isOpen: false,
-        formMode: "add"
+		defaultValue: {
+			content: "",
+			id: "",
+			title: "",
+		},
+
+		shouldValidate: "onBlur",
+		shouldRevalidate: "onInput",
+		onValidate: ({ formData }) =>
+			parseWithZod(formData, { schema: formSchema }),
 	})
 
-    // A FUNCTION THAT REURNS AN ARRAY OF NOTES
-    function notesGenerator(): JSX.Element[] | void{
-        if(!APIData.data.length || !isNotes(APIData.data)){
-            
-        }else{
-            return APIData.data.map((data, index) => (
+	// A STATE TO KEEP TRACK OF THE PAGE STATUS
+	const [pageStatus, setPageStatus] = React.useState<PageStatusType>({
+		isOpen: false,
+		pageMode: "add",
+		rootError: "",
+		rootSuccess: "",
+		currentID: "",
+	})
+
+	// A FUNCTION THAT REURNS AN ARRAY OF NOTES, while generating errors
+	function notesGenerator(): JSX.Element[] | void {
+		if (!isNotes(APIData.data)) {
+			setPageStatus((prevStatus) => ({
+				...prevStatus,
+				rootError: APIData.error ?? "The data obtained is invalid",
+				rootSuccess: "",
+			}))
+		} else {
+			return APIData.data.map((data, index) => (
 				<li
-					key={data.ID}
+					key={data.id}
 					className="note">
 					<Note
-						date={data.date}
+						date={data.createdAt}
 						index={index}
 						title={data.title}
 						content={data.content}
-						
-                        handleEdit={() => {
-                            setFormData((prevState) => ({
-								...prevState,
-                                ID: data.ID,
-                                title: data.title
-							}))
-
-                            setFormStatus((prevState) => ({
-								...prevState,
+						handleEdit={() =>
+							setPageStatus({
+								currentID: data.id,
 								isOpen: true,
-                                formMode: "edit"
+								pageMode: "edit",
+								rootError: "",
+								rootSuccess: "",
+							})
+						}
+						handleDelete={() => {
+							setPageStatus((prevStatus) => ({
+								...prevStatus,
+								rootError: "",
+								rootSuccess: "",
 							}))
-                        }}
 
-						handleDelete={() => fetcher.submit(
-								{ ID: data.ID },
+							fetcher.submit(
+								{ id: data.id },
 
 								{
 									action: "/notes",
 									method: "DELETE",
 								}
 							)
-						}
+						}}
 					/>
 				</li>
 			))
-        }
-    }
+		}
+	}
 
-    // A USE EFFECT TO SYNC THE API RESULTS WITH THE FORM STATUS
-    React.useEffect(() => {
-        if(APIResponse){
-            setFormStatus(prevStatus => ({
-                ...prevStatus,
-				error: APIResponse.error || "",
-				success: APIResponse.success || "",
+	// A function to generate errors
+	function errorGenerator(errors: string[]): JSX.Element[] {
+		return errors.map((error, index) => (
+			<p
+				className="error"
+				key={index}
+            >
+				{error}
+			</p>
+		))
+	}
+
+	// A USE EFFECT TO SYNC THE API RESULTS WITH THE PAGE STATUS
+	React.useEffect(() => {
+		if (APIData)
+			setPageStatus((prevStatus) => ({
+				...prevStatus,
+				rootError: APIData.error ?? "",
+				rootSuccess: APIData.success ?? "",
 			}))
-        }else if(APIData){
-             setServerStatus({
-                error: APIData.error || "",
-                success: APIData.success || "",
-            })
-        }
-    }, [APIResponse, APIData])
+	}, [APIData])
 
 	return (
 		<main id="content">
-			{serverStatus?.error ? (
-				<p className="error">{serverStatus.error}</p>
-			) : formStatus.isOpen ? (
-				<Form
-					disabled={loading === "loading"}
-                    formMode={formStatus.formMode}
-                    formData={formData}
-                    handleChange={handleFormData}
-					
-                    handleClick={() => {
-                        setFormData({
-                            ID: "",
-                            title: "",
-                            content: ""
-                        })
+			{pageStatus.isOpen ? (
+				<fetcher.Form
+					method={pageStatus.pageMode === "add" ? "POST" : "PATCH"}
+					id={form.id}>
+					{pageStatus.pageMode === "edit" && (
+						<>
+							<input
+								{...getInputProps(fields.id, {
+									type: "hidden",
+									value: false,
+								})}
+								value={pageStatus.currentID}
+							/>
 
-                        setFormStatus((prevState) => ({
-							...prevState,
-							isOpen: false,
-						}))
-                    }}
-				/>
+							{errorGenerator(fields.id.errors || [])}
+						</>
+					)}
+
+					<div>
+						<label htmlFor={fields.title.id}>Title</label>
+						<input
+							{...getInputProps(fields.title, { type: "text" })}
+						/>
+
+						{errorGenerator(fields.title.errors  || [])}
+					</div>
+
+					<div>
+						<label htmlFor={fields.content.id}>Content</label>
+						<textarea
+							{...getTextareaProps(fields.content)}
+							rows={5}
+						/>
+
+						{errorGenerator(fields.content.errors  || [])}
+					</div>
+
+					<div className="form-actions">
+						<button
+							className="form-actions--button"
+							disabled={loading !== "idle"}>
+							{loading !== "idle"
+								? "Loading..."
+								: pageStatus.pageMode === "add"
+								? "Add note"
+								: "Edit note"}
+						</button>
+					</div>
+				</fetcher.Form>
 			) : (
 				<>
 					<ul id="note-list">{notesGenerator()!}</ul>
-
-					{(formStatus.error || formStatus.success) && (
-						<p className={formStatus.error ? "error" : "success"}>
-							{formStatus.success || formStatus.error || serverStatus.success}
-						</p>
+					
+                    {pageStatus.rootSuccess && (
+						<p className="success">{pageStatus.rootSuccess}</p>
 					)}
+
+                    {pageStatus.rootError && (
+                       <p className="error">{pageStatus.rootError}</p>
+                    )}
 
 					<button
 						className="form-actions--button"
-						
-                        onClick={() =>
-							setFormStatus((prevState) => ({
+						onClick={() =>
+							setPageStatus((prevState) => ({
 								...prevState,
 								isOpen: true,
+								rootError: "",
+								rootSuccess: "",
+								pageMode: "add",
 							}))
-						}
-                    >
+						}>
 						Add new note
 					</button>
 				</>
-			)}
+            )}
 		</main>
 	)
 }

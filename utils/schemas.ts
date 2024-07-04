@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { isMongoId } from "validator"
+import validator from "validator"
 
 // Declaring the note schema
 export const noteSchema = z.object({
@@ -19,7 +19,7 @@ export const noteSchema = z.object({
 export const noteIDSchema = z.object({
 	id: z
 		.string({ message: "The _id property must be a string" })
-		.refine((val) => isMongoId(val), {
+		.refine((val) => validator.isMongoId(val), {
 			message: "The _id param must be a valid ID",
             path: ["id"]
 		}),

@@ -55,7 +55,6 @@ export type Picker<
  * A Generic to get the return type of a function
  * @param FuctionType The typr of function to parse
  */
-
 export type GetFunctionReturn<FunctionType extends (...args: never) => unknown> =
 	FunctionType extends (...args: never) => infer ReturnType
 		? ReturnType
