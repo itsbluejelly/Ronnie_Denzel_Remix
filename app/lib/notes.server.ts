@@ -1,7 +1,7 @@
 // IMPORTING NECESSARY FILES
 import prisma from "utils/prismaClient"
 import { Picker } from "~/types/generics"
-import { ActionFunctionArgs, json } from "@remix-run/node"
+import { ActionFunctionArgs, json, redirect } from "@remix-run/node"
 import { noteSchema, noteIDSchema } from "utils/schemas"
 import { parseWithZod } from "@conform-to/zod"
 
@@ -40,7 +40,7 @@ export async function addNote(request: RequestType) {
 
 		if (newNote.id) {
 			console.log({ id: newNote.id })
-			return null
+			return redirect("/notes", {status: 201})
 		} else {
 			throw new Error("An error during creation occured")
 		}
@@ -141,15 +141,30 @@ export async function updateNote(request: RequestType) {
 		const { id, title, content } = submission.value
 
 		// Update the note if all is okay
+		const oldNote = await prisma.note.findUniqueOrThrow({
+			where: {id}
+		}).catch((error: unknown) => {
+			if((error as {code: string}).code === "P2025"){
+				throw new Error("This note could not be found")
+			}else{
+				throw new Error((error as Error).message)
+			}
+		})
+
 		const updatedNote = await prisma.note.update({
 			where: { id },
-			data: { title, content },
+			
+			data: {
+				content: content ?? oldNote.content,
+				title: title ?? oldNote.title
+			},
+
 			select: { id: true },
 		})
 
 		if (updatedNote.id) {
 			console.log({ id: updatedNote.id })
-			return null
+			return redirect("/notes", {status: 200})
 		} else {
 			throw new Error("An error during creation occured")
 		}
@@ -202,7 +217,7 @@ export async function deleteNote(request: RequestType) {
 
 		if (deletedNote.id) {
 			console.log({ id: deletedNote.id })
-			return null
+			return redirect("/notes", { status: 200 })
 		} else {
 			throw new Error("An error during creation occured")
 		}

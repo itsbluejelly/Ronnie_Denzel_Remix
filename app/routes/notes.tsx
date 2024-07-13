@@ -8,7 +8,12 @@ import { PageStatusType } from "~/types/types"
 import React from "react"
 import { addNote, deleteNote, readNotes, updateNote } from "~/lib/notes.server"
 import { useFetcher, useLoaderData } from "@remix-run/react"
-import { useForm, getInputProps, getTextareaProps } from "@conform-to/react"
+import {
+	useForm,
+	getInputProps,
+	getTextareaProps,
+	getFormProps,
+} from "@conform-to/react"
 import { getZodConstraint, parseWithZod } from "@conform-to/zod"
 // IMPORTING GUARDS
 import { isNotes } from "~/types/guards"
@@ -124,8 +129,7 @@ export default function NotesPage() {
 		return errors.map((error, index) => (
 			<p
 				className="error"
-				key={index}
-            >
+				key={index}>
 				{error}
 			</p>
 		))
@@ -146,29 +150,48 @@ export default function NotesPage() {
 			{pageStatus.isOpen ? (
 				<fetcher.Form
 					method={pageStatus.pageMode === "add" ? "POST" : "PATCH"}
-					id={form.id}>
+					{...getFormProps(form)}>
 					{pageStatus.pageMode === "edit" && (
 						<>
-							<input
-								{...getInputProps(fields.id, {
-									type: "hidden",
-									value: false,
-								})}
-								value={pageStatus.currentID}
-							/>
+							<div>
+								<input
+									{...getInputProps(fields.id, {
+										type: "hidden",
+										value: false,
+									})}
+									value={pageStatus.currentID}
+								/>
 
-							{errorGenerator(fields.id.errors || [])}
+								{errorGenerator(fields.id.errors || [])}
+							</div>
+
+							<div>
+								<input
+									{...getInputProps(fields.title, {
+										type: "text",
+										value: false,
+									})}
+									value={
+										APIData.data.find(
+											(item) =>
+												item.id === pageStatus.currentID
+										)?.title
+									}
+								/>
+
+								{errorGenerator(fields.title.errors || [])}
+							</div>
 						</>
 					)}
 
-					<div>
+					{pageStatus.pageMode === "add" && <div>
 						<label htmlFor={fields.title.id}>Title</label>
 						<input
 							{...getInputProps(fields.title, { type: "text" })}
 						/>
 
-						{errorGenerator(fields.title.errors  || [])}
-					</div>
+						{errorGenerator(fields.title.errors || [])}
+					</div>}
 
 					<div>
 						<label htmlFor={fields.content.id}>Content</label>
@@ -177,7 +200,7 @@ export default function NotesPage() {
 							rows={5}
 						/>
 
-						{errorGenerator(fields.content.errors  || [])}
+						{errorGenerator(fields.content.errors || [])}
 					</div>
 
 					<div className="form-actions">
@@ -195,14 +218,14 @@ export default function NotesPage() {
 			) : (
 				<>
 					<ul id="note-list">{notesGenerator()!}</ul>
-					
-                    {pageStatus.rootSuccess && (
+
+					{pageStatus.rootSuccess && (
 						<p className="success">{pageStatus.rootSuccess}</p>
 					)}
 
-                    {pageStatus.rootError && (
-                       <p className="error">{pageStatus.rootError}</p>
-                    )}
+					{pageStatus.rootError && (
+						<p className="error">{pageStatus.rootError}</p>
+					)}
 
 					<button
 						className="form-actions--button"
@@ -218,7 +241,7 @@ export default function NotesPage() {
 						Add new note
 					</button>
 				</>
-            )}
+			)}
 		</main>
 	)
 }
