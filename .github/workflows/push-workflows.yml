@@ -1,20 +1,29 @@
-name: Test workflows
+name: Testing workflows
+
 on: 
-     push:
-        branches:
-        - main
+    push: 
+        branches: 
+            - main
 
-run-name: Tesing env vars
 jobs:
-  test-workflows:
-    name: Workflow tests
-    environment: Production
-    runs-on: ubuntu-latest
-    steps:
-        - name: checkout repo
-        uses: actions/checkout@v4
+    First command:
+        name: Testing commands
+        runs-on: [ubuntu-latest]
+        steps:
+            - name: Checking out repo
+            uses: actions/checkout@v4
 
-        -name: actual test
-        run: echo "HELLO TESTS"
+            - name: First command
+            run: "echo FIRST COMMAND"
+
+    Second command:
+        needs: First command
+        name: Final testing
+        runs-on: [windows-latest]
+        steps:
+            - name: Last command
+            run: "echo LAST COMMAND"
+    
+
         
         
