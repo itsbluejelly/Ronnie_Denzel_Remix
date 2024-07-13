@@ -7,3 +7,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
        - run: "echo ${{vars.RUN_TESTS}}"
+       - name: "attempt test"
+       - if: vars.RUN_TESTS == TRUE
