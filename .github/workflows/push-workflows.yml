@@ -3,8 +3,9 @@ on: [push, pull_request]
 run-name: Tesing env vars
 jobs:
   test-workflows:
-    if: vars.RUN_TESTS == 'TRUE'
     environment: Production
     runs-on: ubuntu-latest
+    env:
+      SUPER_ANTI: "TRUE"
     steps:
-       - run: "echo ${{vars.RUN_TESTS}}"
+        - run: "echo $SUPER_ANTI"
