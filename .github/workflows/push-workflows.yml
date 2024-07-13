@@ -1,11 +1,20 @@
 name: Test workflows
-on: [push, pull_request]
+on: 
+     push:
+        branches:
+        - main
+
 run-name: Tesing env vars
 jobs:
   test-workflows:
+    name: Workflow tests
     environment: Production
     runs-on: ubuntu-latest
-    env:
-      SUPER_ANTI: "TRUE"
     steps:
-        - run: "echo $SUPER_ANTI"
+        - name: checkout repo
+        uses: actions/checkout@v4
+
+        -name: actual test
+        run: echo "HELLO TESTS"
+        
+        
