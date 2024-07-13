@@ -6,23 +6,23 @@ on:
             - main
 
 jobs:
-    First command:
+    First-command:
         name: Testing commands
         runs-on: [ubuntu-latest]
         steps:
             - name: Checking out repo
-            uses: actions/checkout@v4
+              uses: actions/checkout@v4
 
             - name: First command
-            run: "echo FIRST COMMAND"
+              run: "echo FIRST COMMAND"
 
-    Second command:
-        needs: First command
+    Second-command:
+        needs: First-command
         name: Final testing
         runs-on: [windows-latest]
         steps:
             - name: Last command
-            run: "echo LAST COMMAND"
+              run: "echo LAST COMMAND"
     
 
         
