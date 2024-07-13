@@ -18,9 +18,9 @@ export const noteSchema = z.object({
 // Declaring the note ID schema
 export const noteIDSchema = z.object({
 	id: z
-		.string({ message: "The _id property must be a string" })
+		.string({ message: "The id property must be a string" })
 		.refine((val) => validator.isMongoId(val), {
-			message: "The _id param must be a valid ID",
+			message: "The id param must be a valid ID",
             path: ["id"]
 		}),
 })
