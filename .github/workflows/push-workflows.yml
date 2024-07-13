@@ -1,9 +1,9 @@
-name: Unit Tests
+name: Test workflows
 on: [push]
+run-name: Tesing env vars
 jobs:
   test-workflows:
     environment: Production
     runs-on: ubuntu-latest
-    if: vars.RUN_TESTS == 'TRUE'
     steps:
-        - run: "echo ${{vars.RUN_TESTS}}"
+       - run: "echo ${{vars.RUN_TESTS}}"
