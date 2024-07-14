@@ -23,9 +23,9 @@ const noteAndIDSchema = noteIDSchema.and(noteSchema.partial())
  * @param fields The fields to return from the new note
  * @param note The new note to include
  */
-export async function addNote(
+export async function addNote<ReturnType extends OptionalGenerator<NoteType>>(
 	note: z.infer<typeof noteSchema>,
-	fields: (keyof NoteType)[] = ["content", "title", "id"]
+	fields: (keyof NoteType)[] = ["content", "title", "id", "createdAt", "updatedAt"]
 ) {
 	try {
 		const submission = noteSchema.safeParse(note)
@@ -58,7 +58,7 @@ export async function addNote(
 		console.log(`New note created successfully: ${newNote.id}`)
 
 		// Return the created note with the required fields
-		const returnedNote: OptionalGenerator<NoteType> = Object()
+		const returnedNote: ReturnType = Object()
 		for (const key of fields)
 			returnedNote[key] = newNote[key] as string & Date
 
@@ -72,8 +72,8 @@ export async function addNote(
  * A function that is used to get all notes from the mock database
  * @param fields The fields to return in each of the returned note, instead of the whole note
  */
-export async function readNotes(
-	fields: (keyof NoteType)[] = ["content", "title", "id"]
+export async function readNotes<ReturnType extends OptionalGenerator<NoteType>>(
+	fields: (keyof NoteType)[] = ["content", "title", "id", "createdAt", "updatedAt"]
 ) {
 	try {
 		// Get the notes
@@ -88,9 +88,9 @@ export async function readNotes(
 		)
 
 		// Return the notes with the required fields
-		const returnedNotes: OptionalGenerator<NoteType>[] = notes.map(
+		const returnedNotes: ReturnType[] = notes.map(
 			(note) => {
-				const noteObject: OptionalGenerator<NoteType> = Object()
+				const noteObject: ReturnType = Object()
 
 				for (const key of fields) {
 					noteObject[key] = note[key] as string & Date
@@ -112,10 +112,10 @@ export async function readNotes(
  * @param newNote The object with the new details to replace the old note
  * @param fields The fields to return in the edited note
  */
-export async function editNote(
+export async function editNote<ReturnType extends OptionalGenerator<NoteType>>(
 	filter: z.infer<typeof noteAndIDSchema>,
 	newNote: OptionalGenerator<z.infer<typeof noteSchema>>,
-	fields: (keyof NoteType)[] = ["content", "title", "id"]
+	fields: (keyof NoteType)[] = ["content", "title", "id", "createdAt", "updatedAt"]
 ) {
 	try {
 		const submission = noteAndIDSchema.safeParse(filter)
@@ -165,7 +165,7 @@ export async function editNote(
 		console.log(`Note updated successfully: ${editedNote.id}`)
 
 		// Return the note with the required fields
-		const returnedNote: OptionalGenerator<NoteType> = Object()
+		const returnedNote: ReturnType = Object()
 		for (const key of fields)
 			returnedNote[key] = editedNote[key] as string & Date
 
@@ -180,9 +180,9 @@ export async function editNote(
  * @param filter The object containing the details of the old note
  * @param fields The fields to return in the edited note
  */
-export async function deleteNote(
+export async function deleteNote<ReturnType extends OptionalGenerator<NoteType>>(
 	filter: z.infer<typeof noteAndIDSchema>,
-	fields: (keyof NoteType)[] = ["id"]
+	fields: (keyof NoteType)[] = ["id", "content", "createdAt", "updatedAt", "title"]
 ) {
 	try {
 		const submission = noteAndIDSchema.safeParse(filter)
@@ -230,7 +230,7 @@ export async function deleteNote(
 		console.log(`Note deleted successfully: ${oldNote.id}`)
 
 		// Return the note with the required fields
-		const deletedNote: OptionalGenerator<NoteType> = Object()
+		const deletedNote: ReturnType = Object()
 		for (const key of fields)
 			deletedNote[key] = oldNote[key] as string & Date
 
@@ -244,8 +244,8 @@ export async function deleteNote(
  * A function that is used to delete all notes from the mock database
  * @param fields The fields to return in each of the deleted notes, instead of the whole note
  */
-export async function deleteAllNotes(
-	fields: (keyof NoteType)[] = ["id"]
+export async function deleteAllNotes<ReturnType extends OptionalGenerator<NoteType>>(
+	fields: (keyof NoteType)[] = ["id", "content", "createdAt", "updatedAt", "title"]
 ) {
 	try {
 		// Get the old notes
@@ -265,8 +265,8 @@ export async function deleteAllNotes(
 		)
 
 		// Return the deleted notes with the required fields
-		const deletedNotes: OptionalGenerator<NoteType>[] = notes.map(note => {
-            const noteObject: OptionalGenerator<NoteType> = Object()
+		const deletedNotes: ReturnType[] = notes.map(note => {
+            const noteObject: ReturnType = Object()
             for(const key of fields) noteObject[key] = note[key] as string & Date
             
             return noteObject
@@ -277,5 +277,3 @@ export async function deleteAllNotes(
 		console.error(`${(error as Error).name}: ${(error as Error).message}`)
 	}
 }
-
-deleteAllNotes()
