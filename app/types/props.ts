@@ -1,19 +1,9 @@
-// IMPORTING NECESSARY FILES
-    // IMPORTING GENERICS
-import {Prettier, Excluder} from "./generics"
-
-// PROPS FOR THE FORM COMPONENT
-export type FormProps = {
-    disabled: boolean,
-    handleClick(): void,
-    handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void,
-    formMode: "add" | "edit",
-    formData: FormDataType & {ID: string}
-}
-
 // PROPS FOR THE NOTE COMPONENT
-export type NoteProps = Prettier<Excluder<NoteType, "ID"> & { 
+export type NoteProps = { 
     index: number,
     handleEdit(): void,
-    handleDelete(): void 
-}>
+    handleDelete(): void,
+    date: string,
+    title: string,
+    content: string | null
+}

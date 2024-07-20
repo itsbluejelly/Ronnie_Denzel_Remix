@@ -1,6 +1,9 @@
 // IMPORTING NECESSARY FILES
-import { notes as recordedNotes } from "./seed.json"
 import prisma from "utils/prismaClient"
+import {faker} from "@faker-js/faker"
+
+// Declaring global variables
+const totalFakeNotes = 3
 
 // The function to seed the database
 async function seed() {
@@ -27,11 +30,11 @@ async function seed() {
 		// Starting to fill the database
 		console.log("\tFilling in the database⌛...")
 
-		for (let i = 0; i < recordedNotes.length; i++) {
+		for (let i = 0; i < totalFakeNotes; i++) {
 			const newNote = await prisma.note.create({
 				data: {
-					title: recordedNotes[i].title,
-					content: recordedNotes[i].content,
+					title: faker.person.firstName(),
+					content: faker.person.bio(),
 				},
 
 				select: {

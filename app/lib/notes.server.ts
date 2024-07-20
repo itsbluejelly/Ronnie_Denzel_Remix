@@ -40,7 +40,7 @@ export async function addNote(request: RequestType) {
 
 		if (newNote.id) {
 			console.log({ id: newNote.id })
-			return redirect("/notes", {status: 201})
+			return redirect("/notes")
 		} else {
 			throw new Error("An error during creation occured")
 		}
@@ -120,10 +120,10 @@ export async function readNotes() {
 }
 
 /**
- * A function to update a note
+ * A function to edit a note
  * @param request The HTTP request to parse
  */
-export async function updateNote(request: RequestType) {
+export async function editNote(request: RequestType) {
 	const formData = await request.formData()
 	const formSchema = noteSchema.partial().and(noteIDSchema)
 
@@ -164,7 +164,7 @@ export async function updateNote(request: RequestType) {
 
 		if (updatedNote.id) {
 			console.log({ id: updatedNote.id })
-			return redirect("/notes", {status: 200})
+			return redirect("/notes")
 		} else {
 			throw new Error("An error during creation occured")
 		}
@@ -217,7 +217,7 @@ export async function deleteNote(request: RequestType) {
 
 		if (deletedNote.id) {
 			console.log({ id: deletedNote.id })
-			return redirect("/notes", { status: 200 })
+			return redirect("/notes")
 		} else {
 			throw new Error("An error during creation occured")
 		}

@@ -6,7 +6,7 @@ import { ActionFunctionArgs } from "@remix-run/node"
 import { PageStatusType } from "~/types/types"
 // IMPORTING MODULES
 import React from "react"
-import { addNote, deleteNote, readNotes, updateNote } from "~/lib/notes.server"
+import { addNote, deleteNote, readNotes, editNote } from "~/lib/notes.server"
 import { useFetcher, useLoaderData } from "@remix-run/react"
 import {
 	useForm,
@@ -25,7 +25,7 @@ import { z } from "zod"
 export async function action({ request }: ActionFunctionArgs) {
 	switch (request.method) {
 		case "PATCH":
-			return updateNote(request)
+			return editNote(request)
 		case "DELETE":
 			return deleteNote(request)
 		default:
