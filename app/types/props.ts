@@ -1,6 +1,4 @@
 // IMPORTING NECESSARY FILES
-    // IMPORTING TYPES
-import { NoteType, FormDataType } from "./types";
     // IMPORTING GENERICS
 import {Prettier, Excluder} from "./generics"
 

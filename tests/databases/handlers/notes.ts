@@ -57,7 +57,7 @@ const addNoteHandler = http.post("/notes", async ({ request }) => {
 						error
 							? `${(error as Error).name}: ${
 									(error as Error).message
-							  }`
+							}`
 							: "An internal server error occured",
 					],
 				}),

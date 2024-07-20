@@ -1,25 +1,3 @@
 {
-    "notes": [
-        {
-            "title": "third",
-            "content": "temporary",
-            "createdAt": "2024-07-20T12:45:52.910Z",
-            "updatedAt": "2024-07-20T12:45:52.910Z",
-            "id": "376a65cf10c7579f2e44030959832334"
-        },
-        {
-            "title": "second",
-            "content": "",
-            "createdAt": "2024-07-20T12:45:17.953Z",
-            "updatedAt": "2024-07-20T12:45:17.953Z",
-            "id": "711553ea1fd70650146430eb552da423"
-        },
-        {
-            "title": "first",
-            "content": "permanent",
-            "createdAt": "2024-07-20T12:44:37.326Z",
-            "updatedAt": "2024-07-20T12:44:37.339Z",
-            "id": "8d2f0fd6dd1d70c745c5738ea22529a9"
-        }
-    ]
+    "notes": []
 }

@@ -339,3 +339,5 @@ export async function deleteAllNotes<
 		console.error(`${(error as Error).name}: ${(error as Error).message}`)
 	}
 }
+
+deleteAllNotes()

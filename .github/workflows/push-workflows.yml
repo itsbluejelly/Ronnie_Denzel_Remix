@@ -1,29 +1,32 @@
 name: Testing workflows
 
-on: 
-    push: 
-        branches: 
+on:
+    push:
+        branches:
             - main
 
 jobs:
-    First-command:
-        name: Testing commands
+    Type-checking:
+        name: Type-checking🧐
         runs-on: [ubuntu-latest]
+
         steps:
+            - name: Setup Bun
+              uses: oven-sh/setup-bun@v2.0.1
+
             - name: Checking out repo
               uses: actions/checkout@v4
 
-            - name: First command
-              run: "echo FIRST COMMAND"
+            - name: Setup deps
+              run: bun i
+
+            - name: Type check
+              run: bun run typecheck
 
     Second-command:
-        needs: First-command
+        needs: Type-checking
         name: Final testing
         runs-on: [windows-latest]
         steps:
             - name: Last command
               run: "echo LAST COMMAND"
-    
-
-        
-        
