@@ -7,7 +7,7 @@ import { PageStatusType } from "~/types/types"
 // IMPORTING MODULES
 import React from "react"
 import { addNote, deleteNote, readNotes, editNote } from "~/lib/notes.server"
-import { useFetcher, useLoaderData } from "@remix-run/react"
+import { Form, useActionData, useLoaderData, useNavigation } from "@remix-run/react"
 import {
 	useForm,
 	getInputProps,
@@ -41,9 +41,8 @@ export async function loader() {
 // A FUNCTION THAT RETURNS THE NOTESPAGE
 export default function NotesPage() {
 	// FETCHING LATEST ACTION AND LOADER CALLS AND FORM NAVIGATION
-	const fetcher = useFetcher<typeof action>()
-	const loading = fetcher.state
-	const APIResponse = fetcher.data
+	const loading = useNavigation().state
+	const APIResponse = useActionData<typeof action>()
 	const APIData = useLoaderData<typeof loader>()
 
 	// Defining the form attributes
@@ -87,12 +86,15 @@ export default function NotesPage() {
 			return APIData.data.map((data, index) => (
 				<li
 					key={data.id}
-					className="note">
+					className="note"
+				>
 					<Note
 						date={data.createdAt}
 						index={index}
 						title={data.title}
 						content={data.content}
+						formData={{id: data.id}}
+						
 						handleEdit={() =>
 							setPageStatus({
 								currentID: data.id,
@@ -102,21 +104,13 @@ export default function NotesPage() {
 								rootSuccess: "",
 							})
 						}
+						
 						handleDelete={() => {
 							setPageStatus((prevStatus) => ({
 								...prevStatus,
 								rootError: "",
 								rootSuccess: "",
 							}))
-
-							fetcher.submit(
-								{ id: data.id },
-
-								{
-									action: "/notes",
-									method: "DELETE",
-								}
-							)
 						}}
 					/>
 				</li>
@@ -148,7 +142,7 @@ export default function NotesPage() {
 	return (
 		<main id="content">
 			{pageStatus.isOpen ? (
-				<fetcher.Form
+				<Form
 					method={pageStatus.pageMode === "add" ? "POST" : "PATCH"}
 					{...getFormProps(form)}>
 					{pageStatus.pageMode === "edit" && (
@@ -214,7 +208,7 @@ export default function NotesPage() {
 								: "Edit note"}
 						</button>
 					</div>
-				</fetcher.Form>
+				</Form>
 			) : (
 				<>
 					<ul id="note-list">{notesGenerator()!}</ul>

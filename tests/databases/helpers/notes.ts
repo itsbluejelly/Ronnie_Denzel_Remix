@@ -12,7 +12,7 @@ import z from "zod"
 import { noteSchema } from "utils/schemas"
 
 // Declaring the global variables to be used within the file
-const filePath: string = path.join(__dirname, "..", "notes.json")
+const filePath: string = path.join(import.meta.dirname, "..", "notes.json")
 const noteIDSchema = z.object({
 	id: z.string({ message: "The id param must be a valid string" }),
 })

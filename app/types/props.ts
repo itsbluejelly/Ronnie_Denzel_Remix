@@ -5,5 +5,6 @@ export type NoteProps = {
     handleDelete(): void,
     date: string,
     title: string,
-    content: string | null
+    content: string | null,
+    formData: {id: string}
 }

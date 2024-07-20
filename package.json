@@ -4,7 +4,7 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "build": "prisma generate && prisma:unseed && remix vite:build",
+    "build": "prisma generate && tsx ./prisma/seed/unseed.ts && remix vite:build",
     "dev": "remix vite:dev",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "remix-serve ./build/server/index.js",
@@ -21,6 +21,7 @@
     "@remix-run/node": "^2.9.2",
     "@remix-run/react": "^2.9.2",
     "@remix-run/serve": "^2.9.2",
+    "@types/mocha": "^10.0.7",
     "@types/validator": "^13.12.0",
     "isbot": "^4.1.0",
     "react": "^18.2.0",
@@ -54,5 +55,10 @@
   },
   "prisma": {
     "seed": "tsx ./prisma/seed/seed.ts"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }
