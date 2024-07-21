@@ -4,18 +4,18 @@ import type { Note as NoteType } from "@prisma/client"
 // IMPORT GENERICS
 import type { OptionalGenerator } from "~/types/generics"
 // IMPORT MODULES
-import path from "path"
-import fs from "fs/promises"
 import { generateID } from "utils/database"
 import z from "zod"
 // IMPORT SCHEMAS
 import { noteSchema } from "utils/schemas"
 
 // Declaring the global variables to be used within the file
-const filePath: string = path.join(import.meta.dirname, "..", "notes.json")
+const testDB: { notes: NoteType[] } = { notes: [] }
+
 const noteIDSchema = z.object({
 	id: z.string({ message: "The id param must be a valid string" }),
 })
+
 const noteAndIDSchema = noteIDSchema.and(noteSchema.partial())
 
 /**
@@ -38,9 +38,7 @@ export async function addNote<ReturnType extends OptionalGenerator<NoteType>>(
 		if (!submission.success) throw new Error(submission.error.message)
 
 		// Get the old notes
-		const { notes: oldNotes } = JSON.parse(
-			await fs.readFile(filePath, { encoding: "utf-8" })
-		) as { notes: NoteType[] }
+		const { notes: oldNotes } = testDB
 
 		// Create the new note
 		const newNote: NoteType = {
@@ -53,15 +51,7 @@ export async function addNote<ReturnType extends OptionalGenerator<NoteType>>(
 
 		// Store the result in the db
 		const newNotes: NoteType[] = [newNote, ...oldNotes]
-
-		await fs.writeFile(
-			filePath,
-			JSON.stringify({ notes: newNotes }, null, 4),
-			{
-				encoding: "utf-8",
-			}
-		)
-
+		testDB.notes = newNotes
 		console.log(`New note created successfully: ${newNote.id}`)
 
 		// Return the created note with the required fields
@@ -96,9 +86,7 @@ export async function readNotes<ReturnType extends OptionalGenerator<NoteType>>(
 ) {
 	try {
 		// Get the notes
-		const { notes } = JSON.parse(
-			await fs.readFile(filePath, { encoding: "utf-8" })
-		) as { notes: NoteType[] }
+		const { notes } = testDB
 
 		console.log(
 			`${notes.length} note${
@@ -167,9 +155,7 @@ export async function editNote<ReturnType extends OptionalGenerator<NoteType>>(
 		if (!submission.success) throw new Error(submission.error.message)
 
 		// Get the old notes
-		const { notes: oldNotes } = JSON.parse(
-			await fs.readFile(filePath, { encoding: "utf-8" })
-		) as { notes: NoteType[] }
+		const { notes: oldNotes } = testDB
 
 		// Get the old note that matches the old note filter
 		const oldNote: NoteType | undefined = oldNotes.find((note) => {
@@ -199,14 +185,7 @@ export async function editNote<ReturnType extends OptionalGenerator<NoteType>>(
 			note.id === editedNote.id ? editedNote : note
 		)
 
-		await fs.writeFile(
-			filePath,
-			JSON.stringify({ notes: editedNotes }, null, 4),
-			{
-				encoding: "utf-8",
-			}
-		)
-
+		testDB.notes = editedNotes
 		console.log(`Note updated successfully: ${editedNote.id}`)
 
 		// Return the note with the required fields
@@ -242,9 +221,7 @@ export async function deleteNote<
 		if (!submission.success) throw new Error(submission.error.message)
 
 		// Get the old notes
-		const { notes: oldNotes } = JSON.parse(
-			await fs.readFile(filePath, { encoding: "utf-8" })
-		) as { notes: NoteType[] }
+		const { notes: oldNotes } = testDB
 
 		// Get the old note that matches the old note filter
 		const oldNote: NoteType | undefined = oldNotes.find((note) => {
@@ -272,14 +249,7 @@ export async function deleteNote<
 			(note) => note.id !== oldNote.id
 		)
 
-		await fs.writeFile(
-			filePath,
-			JSON.stringify({ notes: retainedNotes }, null, 4),
-			{
-				encoding: "utf-8",
-			}
-		)
-
+		testDB.notes = retainedNotes
 		console.log(`Note deleted successfully: ${oldNote.id}`)
 
 		// Return the note with the required fields
@@ -310,14 +280,9 @@ export async function deleteAllNotes<
 ) {
 	try {
 		// Get the old notes
-		const { notes } = JSON.parse(
-			await fs.readFile(filePath, { encoding: "utf-8" })
-		) as { notes: NoteType[] }
-
+		const { notes } = testDB
 		// delete all notes from the db
-		await fs.writeFile(filePath, JSON.stringify({ notes: [] }, null, 4), {
-			encoding: "utf-8",
-		})
+		testDB.notes = []
 
 		console.log(
 			`${notes.length} note${

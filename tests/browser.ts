@@ -1,5 +1,5 @@
 // IMPORTING NECESSARY FILES
-import handlers from "./databases/handlers/client/notes";
+import handlers from "./databases/handlers/notes";
 import {setupWorker} from "msw/browser"
 
 // A browser that is used for testing

@@ -1,5 +1,5 @@
 // IMPORTING NECESSARY FILES
-import handlers from "./databases/handlers/server/notes"
+import handlers from "./databases/handlers/notes"
 import { setupServer } from "msw/node"
 
 // A server that is set up for testing using msw

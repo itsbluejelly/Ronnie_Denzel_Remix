@@ -7,7 +7,7 @@ import {
 	deleteNote,
 	editNote,
 	readNotes,
-} from "../../helpers/notes"
+} from "../helpers/notes"
 // IMPORTING VALIDATORS
 import { noteSchema, noteIDSchema } from "utils/schemas"
 import { parseWithZod } from "@conform-to/zod"
