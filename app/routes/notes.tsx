@@ -2,7 +2,7 @@
 // IMPORTING COMPONENTS
 import Note from "~/components/Note"
 // IMPORTING TYPES
-import { ActionFunctionArgs, json } from "@remix-run/node"
+import { ActionFunctionArgs} from "@remix-run/node"
 import { PageStatusType } from "~/types/types"
 // IMPORTING MODULES
 import React from "react"
@@ -35,17 +35,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 // A LOADER FUNCTION FOR THE NOTES ROUTE
 export async function loader() {
-	return json({
-		data: [{
-			title: "bb",
-			content: "cc",
-			id: "dd",
-			createdAt: "ee",
-			updatedAt: "ff"
-		}],
-		success: "",
-		error: ""
-	})
+	return readNotes()
 }
 
 // A FUNCTION THAT RETURNS THE NOTESPAGE

@@ -1,4 +1,4 @@
-name: Testing workflows
+name: Push workflows
 
 on:
     push:

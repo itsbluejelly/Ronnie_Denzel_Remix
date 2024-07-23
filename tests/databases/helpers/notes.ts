@@ -10,7 +10,17 @@ import z from "zod"
 import { noteSchema } from "utils/schemas"
 
 // Declaring the global variables to be used within the file
-const testDB: { notes: NoteType[] } = { notes: [] }
+const testDB: { notes: NoteType[] } = {
+	notes: [
+		{
+			title: "mocked database",
+			content: "",
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			id: "ba30074873c8f122870ba0b31cf56fc3",
+		},
+	],
+}
 
 const noteIDSchema = z.object({
 	id: z.string({ message: "The id param must be a valid string" }),
