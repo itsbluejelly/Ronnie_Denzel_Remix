@@ -1,5 +1,6 @@
 // IMPORTING NECESSARY FILES
 import prisma from "utils/prismaClient"
+import parsedEnv from "utils/envSchema"
 
 // The function to unseed the database
 async function unseed() {
@@ -21,7 +22,7 @@ async function unseed() {
 			"\t\t2. Checking if the database is in production mode🧐..."
 		)
 
-		if (process.env.NODE_ENV === "production") {
+		if (parsedEnv.NODE_ENV === "production") {
 			throw new Error("The environment is already in production😐")
 		}
 

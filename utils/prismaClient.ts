@@ -1,21 +1,22 @@
 // IMPORTING NECESSARY FILES
 // IMPORTING MODULES
 import { PrismaClient } from "@prisma/client"
+import parsedEnv from "./envSchema"
 
-// Declaring a variable to be tracked and exported as the client
-let temporaryPrismaClient: PrismaClient
-let declaredPrismaClient: PrismaClient | undefined
+// Declaring a temporary and permanent prisma client to ensure one instance is exported
+let declaredPrismaClient: PrismaClient
+let temporaryPrismaClient: PrismaClient | undefined
 
-if (process.env.NODE_ENV === "production") {
-	temporaryPrismaClient = new PrismaClient()
-	temporaryPrismaClient.$connect()
-} else {
-	if (!declaredPrismaClient) {
-		declaredPrismaClient = new PrismaClient()
-		declaredPrismaClient.$connect()
+if(parsedEnv.NODE_ENV === "production"){
+	declaredPrismaClient = new PrismaClient()
+	declaredPrismaClient.$connect()
+}else{
+	if(!temporaryPrismaClient){
+		temporaryPrismaClient = new PrismaClient()
+		temporaryPrismaClient.$connect()
 	}
 
-	temporaryPrismaClient = declaredPrismaClient
+	declaredPrismaClient = temporaryPrismaClient
 }
 
-export default temporaryPrismaClient
+export default declaredPrismaClient

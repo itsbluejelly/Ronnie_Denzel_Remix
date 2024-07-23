@@ -1,6 +1,7 @@
 // IMPORTING NECESSARY FILES
 import prisma from "utils/prismaClient"
-import {faker} from "@faker-js/faker"
+import { faker } from "@faker-js/faker"
+import parsedEnv from "utils/envSchema"
 
 // Declaring global variables
 const totalFakeNotes = 3
@@ -18,12 +19,12 @@ async function seed() {
 			throw new Error("The database is already occupied😐")
 		}
 
-        // Check if the env if in production
+		// Check if the env if in production
 		console.log(
 			"\t\t2. Checking if the database is in production mode🧐..."
 		)
 
-		if (process.env.NODE_ENV === "production") {
+		if (parsedEnv.NODE_ENV === "production") {
 			throw new Error("The environment is already in production😐")
 		}
 

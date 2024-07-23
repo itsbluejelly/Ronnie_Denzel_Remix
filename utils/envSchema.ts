@@ -1,10 +1,20 @@
 // IMPORTING NECESSARY FILES
 import { z } from "zod"
 
-// Declaring the envSchema and envSchemaType to extend the process.env values
+// Declaring the envSchema and parsing the process.env to see if its okay
 export const envSchema = z.object({
-	DATABASE_URL: z.string().url(),
-	VITE_TEST_MODE: z.enum(["TRUE", "FALSE"])
+	DATABASE_URL_PROD: z
+		.string({ message: "The DATABASE_URL_PROD must be a valid string" })
+		.url({ message: "The DATABASE_URL_PROD must be a valid URL" }),
+
+	VITE_TEST_MODE: z.enum(["TRUE", "FALSE"], {
+		message: "The VITE_TEST_MODE must be either 'TRUE' or 'FALSE'"
+	}),
+
+	NODE_ENV: z.enum(["development", "production", "test"], {
+		message: "The NODE_ENV must be either 'test' or 'production' or 'development'"
+	})
 })
 
-export type envSchemaType = z.infer<typeof envSchema>
+const parsedEnv = envSchema.parse(process.env)
+export default parsedEnv
