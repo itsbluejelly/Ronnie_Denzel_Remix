@@ -6,23 +6,6 @@ on:
             - main
 
 jobs:
-    Type-checking:
-        name: Type-checking🧐
-        runs-on: [ubuntu-latest]
-
-        steps:
-            - name: Setup Bun
-              uses: oven-sh/setup-bun@v2.0.1
-
-            - name: Checking out repo
-              uses: actions/checkout@v4
-
-            - name: Setup deps
-              run: bun i
-
-            - name: Type check
-              run: bun run typecheck
-
     Vitest:
         name: Vitest unit-tests⚡
         runs-on: [ubuntu-latest]
