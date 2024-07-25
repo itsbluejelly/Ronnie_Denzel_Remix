@@ -1,57 +1,65 @@
-// IMPORTING NECESSARY FILES
-import { describe, it, beforeEach, afterEach } from "mocha"
-import {expect} from "chai"
+// IMPORT NECESSARY FILES
+import { PrismaClient as SqlitePrismaClient } from "@prisma/@prisma-sqlite"
 
-import {
-	addNote,
-	deleteAllNotes,
-	deleteNote,
-	editNote,
-	readNotes,
-} from "tests/databases/helpers/notes"
+/**
+ * We are importing the SQlite client instead of the actual one or the global one that references the Mongo client so as to prevent using the actual client for testing. We know its testing hence no need for fake data
+ */
+const prisma = new SqlitePrismaClient()
 
-describe("/notes route tests", function () {
-	describe("Testing the route's loader", function () {
-        beforeEach(async function(){
-            console.log("Adding the seed for test database...")
-            
-            const firstNote = await addNote<{title: string}>({title: "First Note"}, ["title"])
-            console.log(`\t1. Recorded the first note: '${firstNote?.title}'`)
+describe("Testing /notes server functions", () => {
+	describe("Testing /notes actions", () => {
+		beforeAll(async () => prisma.$connect())
+		afterAll(async () => prisma.$disconnect())
 
-            const secondNote = await addNote<{title: string}>({title: "Second Note"}, ["title"])
-            console.log(`\t1. Recorded the second note: '${secondNote?.title}'`)
-        })
+		beforeEach(async () => {
+			console.log("Creating a new note...")
 
-        afterEach(async function(){
-            console.log("Clearing the test database...")
-            const deletedNotes = await deleteAllNotes(["id"])
-            console.log(`\tDeleted ${deletedNotes?.length} notes successfully`)
-        })
+			const note = await prisma.note.create({
+				data: {
+					title: "First Note",
+					content: "First content",
+				},
 
-        it("should pass", function(){
-            expect(true).equal(true)
-        })
-    })
+				select: { id: true },
+			})
 
-	describe("Testing the route's actions", function () {
-        beforeEach(async function(){
-            console.log("Adding the seed for test database...")
-            
-            const firstNote = await addNote<{title: string}>({title: "First Note"}, ["title"])
-            console.log(`\t1. Recorded the first note: '${firstNote?.title}'`)
-
-            const secondNote = await addNote<{title: string}>({title: "Second Note"}, ["title"])
-            console.log(`\t1. Recorded the second note: '${secondNote?.title}'`)
-        })
-
-        afterEach(async function(){
-            console.log("Clearing the test database...")
-            const deletedNotes = await deleteAllNotes(["id"])
-            console.log(`\tDeleted ${deletedNotes?.length} notes successfully`)
-        })
-
-        it("should pass", function () {
-			expect(true).equal(true)
+			console.log(`\tNote created, ID: ${note.id}`)
 		})
-    })
+
+		afterEach(async () => {
+			console.log("Deleting previous note instances...")
+			const { count } = await prisma.note.deleteMany()
+			console.log(`\tDeletion complete: deleted ${count} notes`)
+		})
+
+        it("Should be true", () => expect(true).toBeTruthy())
+	})
+
+	describe("Testing /notes loader", () => {
+		beforeAll(async () => prisma.$connect())
+		afterAll(async () => prisma.$disconnect())
+
+		beforeEach(async () => {
+			console.log("Creating a new note...")
+
+			const note = await prisma.note.create({
+				data: {
+					title: "First Note",
+					content: "First content",
+				},
+
+				select: { id: true },
+			})
+
+			console.log(`\tNote created, ID: ${note.id}`)
+		})
+
+		afterEach(async () => {
+			console.log("Deleting previous note instances...")
+			const { count } = await prisma.note.deleteMany()
+			console.log(`\tDeletion complete: deleted ${count} notes`)
+		})
+
+        it("Should be true", () => expect(true).toBeTruthy())
+	})
 })

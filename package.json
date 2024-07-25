@@ -15,7 +15,8 @@
     "prisma:studio:dev": "bunx prisma studio  --schema=./prisma/schema.dev.prisma",
     "prisma:seed": "tsx ./prisma/seed/seed.ts",
     "prisma:unseed": "tsx ./prisma/seed/unseed.ts",
-    "test": "mocha"
+    "test": "bunx prisma migrate deploy --schema=./prisma/schema.dev.prisma && vitest",
+    "test:unit": "vitest --ui"
   },
   "dependencies": {
     "@conform-to/react": "^1.1.5",
@@ -24,12 +25,8 @@
     "@remix-run/node": "^2.9.2",
     "@remix-run/react": "^2.9.2",
     "@remix-run/serve": "^2.9.2",
-    "@types/chai": "^4.3.16",
-    "@types/mocha": "^10.0.7",
     "@types/validator": "^13.12.0",
-    "chai": "^5.1.1",
     "isbot": "^4.1.0",
-    "mocha": "^10.7.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "validator": "^13.12.0",
@@ -51,7 +48,8 @@
     "prisma": "^5.17.0",
     "typescript": "^5.1.6",
     "vite": "^5.1.0",
-    "vite-tsconfig-paths": "^4.2.1"
+    "vite-tsconfig-paths": "^4.2.1",
+    "vitest": "^2.0.4"
   },
   "engines": {
     "node": ">=20.0.0"

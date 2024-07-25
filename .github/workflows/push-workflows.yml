@@ -23,10 +23,23 @@ jobs:
             - name: Type check
               run: bun run typecheck
 
-    Second-command:
-        needs: Type-checking
-        name: Final testing
-        runs-on: [windows-latest]
+    Vitest:
+        name: Vitest unit-tests⚡
+        runs-on: [ubuntu-latest]
+
         steps:
-            - name: Last command
-              run: "echo LAST COMMAND"
+          - name: Setup Bun
+            uses: oven-sh/setup-bun@v2.0.1
+
+          - name: Checkout repo
+            uses: actions/checkout@v4
+
+          - name: Setup env variables
+            run: touch .env | cp .env.example .env
+
+          - name: Install dependancies
+            run: bun i
+
+          - name: Run unit tests
+            run: bun run test
+
