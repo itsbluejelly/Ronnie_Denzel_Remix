@@ -7,6 +7,9 @@ export const envSchema = z.object({
 		.string({ message: "The DATABASE_URL_PROD must be a valid string" })
 		.url({ message: "The DATABASE_URL_PROD must be a valid URL" }),
 
+	DATABASE_URL_DEV: z
+		.string({ message: "The DATABASE_URL_PROD must be a valid string" }),
+
 	VITE_TEST_MODE: z.enum(["TRUE", "FALSE"], {
 		message: "The VITE_TEST_MODE must be either 'TRUE' or 'FALSE'"
 	}),
