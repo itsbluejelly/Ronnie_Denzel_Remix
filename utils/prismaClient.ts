@@ -1,22 +1,23 @@
 // IMPORTING NECESSARY FILES
 // IMPORTING MODULES
-import { PrismaClient } from "@prisma/client"
+import {PrismaClient as MongoPrismaClient} from "@prisma/@prisma-mongodb"
+import {PrismaClient as SqlitePrismaClient} from "@prisma/@prisma-sqlite"
 import parsedEnv from "./envSchema"
 
 // Declaring a temporary and permanent prisma client to ensure one instance is exported
-let declaredPrismaClient: PrismaClient
-let temporaryPrismaClient: PrismaClient | undefined
+let declaredPrismaClient: MongoPrismaClient | SqlitePrismaClient
+let temporaryPrismaClient: SqlitePrismaClient | undefined
 
 if(parsedEnv.NODE_ENV === "production"){
-	declaredPrismaClient = new PrismaClient()
+	declaredPrismaClient = new MongoPrismaClient()
 	declaredPrismaClient.$connect()
 }else{
 	if(!temporaryPrismaClient){
-		temporaryPrismaClient = new PrismaClient()
+		temporaryPrismaClient = new SqlitePrismaClient()
 		temporaryPrismaClient.$connect()
 	}
 
 	declaredPrismaClient = temporaryPrismaClient
 }
 
-export default declaredPrismaClient
+export default declaredPrismaClient as MongoPrismaClient

@@ -51,7 +51,7 @@ async function seed() {
 			)
 		}
 
-		console.log("Database seeded successfully🌱")
+		console.log(`Database seeded successfully🌱`)
 	} catch (error: unknown) {
 		console.error(`${(error as Error).name}: ${(error as Error).message}\n`)
 		await prisma.$disconnect()
