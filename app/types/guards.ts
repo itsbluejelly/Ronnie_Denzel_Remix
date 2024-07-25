@@ -1,5 +1,5 @@
 // IMPORTING NECESSARY TYPES
-import { type Note as NoteType } from "@prisma/client";
+import { type Note as NoteType } from "@prisma/@prisma-mongodb";
 
 // A GUARD FOR THE NOTE DATA
 export function isNotes(data: unknown): data is NoteType[]{

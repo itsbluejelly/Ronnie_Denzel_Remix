@@ -1,6 +1,6 @@
 // IMPORTING NECESSARY TYPES
 // IMPORT TYPES
-import type { Note as NoteType } from "@prisma/client"
+import type { Note as NoteType } from "@prisma/@prisma-mongodb"
 // IMPORT GENERICS
 import type { OptionalGenerator } from "~/types/generics"
 // IMPORT MODULES
